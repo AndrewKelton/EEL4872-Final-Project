@@ -13,8 +13,6 @@ User Interface for EEL 4872 Final Project
 
 '''
 
-import pandas as pd
-
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 
@@ -28,11 +26,17 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
+# dictionary abbreviations of a question
 ID="id"
 QN="question"
 AN="answer"
 AC="answer choices"
 DF="difficulty"
+
+# indexes for variables in lists
+INCORRECT=ID_=0
+CORRECT=AN_=1
+RS=2
 
 
 # GUI class
@@ -45,6 +49,7 @@ class GUI:
         self.questions = questions
         self.correct_count = 0
         self.current_question = 0
+        self.answers_list = [] # [[id,answ,res,diff],...]
 
         # create Tkinter object
         self.root=tk.Tk()
@@ -78,7 +83,7 @@ class GUI:
         self.button_grid_frame = self.button_grid.buttonframe
 
         # load the first question
-        self.load_question(self.current_question)
+        self.load_question()
 
         # exit the window
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -117,44 +122,45 @@ class GUI:
         logging.info(f"User: {self.username} started test.")
 
     # load question into window
-    def load_question(self, idx : int) -> None:
+    def load_question(self) -> None:
 
         # retrieve values
-        question_dir = self.questions[idx]
-        question_id = question_dir[ID] 
-        question = question_dir[QN]
-        choices = question_dir[AC]
+        self.current_question_dir = self.questions.pop(0)
+        question_id = self.current_question_dir[ID] 
+        question = self.current_question_dir[QN]
+        choices = self.current_question_dir[AC]
 
-        logging.debug(f"Loading Question ID {question_id}: {question}") 
+        logging.debug(f"Loading Question ID {question_id}: {question}") # debug print
 
         # set question and answers
         self.question_label.config(text=question)
         self.button_grid.set_answers(choices)
 
     # callback function when a button in grid is pressed
-    def answer_selected(self, current_idx : int, chosen_idx : int) -> None:
-        question_id = self.questions[current_idx][ID]
-        logging.debug(f"Question ID {question_id} has been answered")
+    def answer_selected(self, chosen_idx : int) -> None:
+        question = self.current_question_dir 
+        question_id = question[ID]
 
         selected_answer=self.button_grid.get_chosen_answer(chosen_idx) # collect answered value
-        correct_answer=self.questions[current_idx][AN]                 # collect correct value
+        correct_answer=question[AN]    # collect correct value
+
+        logging.info(f"Question ID: {question_id}\tAnswered: '{selected_answer}'\tAnswer: '{correct_answer}'") # debug print
 
         if selected_answer == correct_answer:
-            logging.info(f"Question ID {question_id}: Correct")
             self.correct_count += 1
+            self.answers_list.append([question_id, selected_answer, CORRECT, question[DF]])
             messagebox.showinfo("Correct", "nice one!")
         else:
-            logging.info(f"Question ID {question_id}: Incorrect")
+            # logging.info(f"Question ID {question_id}: Incorrect")
+            self.answers_list.append([question_id, selected_answer, INCORRECT, question[DF]])
             messagebox.showwarning("Incorrect", f"The correct answer was {correct_answer}.")
+    
+        self.current_question += 1 # increment current question count
         
-
-
-        self.current_question += 1 # move to next question
-        
-        if self.current_question < self.num_of_questions:
+        if len(self.questions) > 0 and self.current_question < self.num_of_questions:
 
             # more questions to complete
-            self.load_question(self.current_question) 
+            self.load_question()
         else:
 
             # all questions have been answered
@@ -193,7 +199,7 @@ class GUI:
                         self.buttonframe,
                         text="",
                         font=('Arial', 10),
-                        command=lambda idx=answer_idx: click_callback(0, idx)
+                        command=lambda idx=answer_idx: click_callback(idx)
                     )
                     btn.grid(row=i,column=j,sticky=tk.W+tk.E)
                     row.append(btn)
@@ -207,13 +213,12 @@ class GUI:
             logging.debug("Setting New Answers")
 
             random_answers = sample(answers, 4) # randomize answer choices
-            answ_idx=0
 
             # set respective answer choices in grid
             for i in range(2):
                 for j in range(2):
-                    self.grid[i][j].config(text=random_answers[answ_idx])
-                    answ_idx+=1
+                    self.grid[i][j].config(text=random_answers.pop(0))
+                    # answ_idx+=1
         
         # return the answer choice's value
         def get_chosen_answer(self, answer_idx) -> any:
