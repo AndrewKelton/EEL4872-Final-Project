@@ -2,7 +2,7 @@
 # Author: Andrew Kelton
 
 # import my gui
-import GUI as gui
+import GUI_tree as gui
 
 # import DT modules
 from sklearn.tree import DecisionTreeClassifier
@@ -11,7 +11,6 @@ from sklearn.metrics import classification_report
 
 import pandas as pd
 import json
-
 
 class QuestionNode: 
 
@@ -37,18 +36,8 @@ def load_tree_from_file(file):
 # main
 def main():
 
-    # read questions from json
-    questions = []
-    with open("questions.json", "r") as qf:
-        questions = json.load(qf)
-
-        # convert difficulties to ints
-        for q in questions: 
-            q["difficulty"]=gui.DIFF_MAP[q["difficulty"]]
-
-    project_gui = gui.GUI(questions) # call game 
-    print(project_gui.answers_list)
-    print("SCORE:", project_gui.score)
+    root_node = load_tree_from_file("questions-tree.json")
+    app = gui.GUI(root_node)
 
 #     # create df from results
 #     if 1 == 0:

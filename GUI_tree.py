@@ -55,18 +55,30 @@ TITLE_FONT_SIZE=48
 QUESTION_FONT_SIZE=24
 BUTTON_FONT_SIZE=22
 
+class QuestionNode: 
+    def __init__(self, question_data, correct_child=None, incorrect_child=None):
+        self.question_data = question_data  # dict with question info
+        self.correct_child = correct_child
+        self.incorrect_child = incorrect_child
+
 
 # GUI class
 class GUI:
 
-    def __init__(self, questions : List[Dict[str, Any]]):
+    def __init__(self, questions : QuestionNode):
 
-        # set initial values
-        self.num_of_questions = len(questions)
-        self.questions = questions
-        self.current_question= self.score = self.correct_count = 0
+        # # set initial values
+        self.current_node = questions
+        self.current_question = 0
         self.start_time = None
-        self.possible_score = 0
+        self.score = 0
+        self.correct_count = 0
+
+        # self.num_of_questions = len(questions)
+        # self.questions = questions
+        # self.current_question= self.score = self.correct_count = 0
+        # self.start_time = None
+        # self.possible_score = 0
 
         self.answers_list = [] # [[id,answ,res,diff, time],...]
         '''
@@ -173,10 +185,12 @@ class GUI:
         self.start_time = time.time()
         
         # update question counter
-        self.counter_label.config(text=f"Question {self.current_question + 1} of {self.num_of_questions}")
+        self.counter_label.config(text=f"Question {self.current_question + 1}")
 
         # retrieve values
-        self.current_question_dir = self.questions.pop(0)
+        self.current_question_dir = self.current_node.question_data
+        print(self.current_question_dir)
+
         question_id = self.current_question_dir[ID] 
         question = self.current_question_dir[QN]
         choices = self.current_question_dir[AC]
@@ -200,49 +214,23 @@ class GUI:
 
         logging.info(f"Question ID: {question_id}\tAnswered: '{selected_answer}'\tAnswer: '{correct_answer}'") # print debug
 
-        self.possible_score += question[DF] + 1
-
         # user's answer correct
         if selected_answer == correct_answer:
-
-            self.correct_count += 1        # increment correct count
-            self.score += question[DF] + 1 # increase user's score
-            self.answers_list.append({
-                "id": question_id, 
-                "selected_answer": selected_answer, 
-                "result": CORRECT, 
-                "difficulty": question[DF], 
-                "time_taken": time_taken
-            })
+            self.current_node = self.current_node.correct_child
             messagebox.showinfo("Correct", "good job!")
 
         # user's answer incorrect
         else:
-
-            # remove a point if difficulty is low
-            if question[DF] == LOW:
-                self.score -= 1
-            
-            self.answers_list.append({
-                "id": question_id, 
-                "selected_answer": selected_answer, 
-                "result": INCORRECT, 
-                "difficulty": question[DF], 
-                "time_taken": time_taken
-            })
+            self.current_node = self.current_node.incorrect_child
             messagebox.showwarning("Incorrect", f"The correct answer was {correct_answer}.")
     
         self.current_question += 1 # increment current question count
         
-        # more questions to complete
-        if len(self.questions) > 0 and self.current_question < self.num_of_questions:
-            self.load_question() 
-        
-        # all questions have been completed
-        else:
-            messagebox.showinfo("Done!", "You have completed all questions!")
+        if self.current_node is None:
             self.results_screen()
-
+        else:
+            self.load_question()
+        
     # print message to terminal
     def show_message(self):
         if self.check_state.get() == 0:
@@ -265,19 +253,19 @@ class GUI:
         )
         label.pack(pady=20)
 
-        # score labels
-        correct_label = tk.Label(
-            result_wdw, 
-            text=f"{self.correct_count} / {self.num_of_questions} questions answered correctly!", 
-            font=('Arial', BUTTON_FONT_SIZE)
-        )
-        correct_label.pack(pady=10)
-        score_label = tk.Label(
-            result_wdw, 
-            text=f"Score: {self.score} / {self.possible_score}!", 
-            font=('Arial', BUTTON_FONT_SIZE)
-        )
-        score_label.pack(pady=10)
+        # # score labels
+        # correct_label = tk.Label(
+        #     result_wdw, 
+        #     text=f"{self.correct_count} / {self.num_of_questions} questions answered correctly!", 
+        #     font=('Arial', BUTTON_FONT_SIZE)
+        # )
+        # correct_label.pack(pady=10)
+        # score_label = tk.Label(
+        #     result_wdw, 
+        #     text=f"Score: {self.score} / {self.possible_score}!", 
+        #     font=('Arial', BUTTON_FONT_SIZE)
+        # )
+        # score_label.pack(pady=10)
 
         # close window
         result_wdw.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(result_wdw))
