@@ -1,0 +1,29 @@
+[
+    {
+        "id": 0,
+        "difficulty": "low",
+        "question": "1 + 1 = ?",
+        "answer": 2,
+        "answer choices": [1,2,3,4]
+    },
+    {
+        "id": 2,
+        "difficulty": "high",
+        "question": "What is the next number in the sequence: 2, 6, 12, 20, 30, __.",
+        "answer": 42,
+        "answer choices": [42, 40, 21, 43]
+    },
+    {
+        "id": 4,
+        "difficulty": "medium",
+        "question": "To be inferior to someone means?",
+        "answer": "to be of lower status",
+        "answer choices": [
+            "to be of higher status",
+            "to be of lower status",
+            "to be poorer",
+            "to be equal to"
+        ]
+    }
+
+]

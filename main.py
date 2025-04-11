@@ -2,47 +2,29 @@
 # Author: Andrew Kelton
 
 import GUI as gui
-import pandas as pd
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
-# Cognitive ability levels
-COGNITIVE_ABILITIES_STRING=["low", "medium", "high"]
-LOW, MEDIUM, HIGH = 0, 1, 2
-
-QUESTIONS=["1 + 1 = ?"]
-ANSWERS=[2]
-ANSWER_CHOICES=[[1,2,3,4]]
-
-# question structure format
-QUESTION1={
-    "id": 0,
-    "difficulty": LOW,
-    "question": "1 + 1 = ?",
-    "answer": 2,
-    "answer choices": [1,2,3,4],
-}
-QUESTION2={
-    "id": 4,
-    "difficulty": HIGH,
-    "question": "What is the next number in the sequence: 2, 6, 12, 20, 30, __.",
-    "answer": 42,
-    "answer choices": [42,40,21,43],
-}
-QUESTION3={
-    "id": 2,
-    "difficulty": MEDIUM,
-    "question": "To be inferior to someone means?",
-    "answer": "to be of lower status",
-    "answer choices": ["to be of higher status","to be of lower status","to be poorer","to be equal to"],
-}
+import pandas as pd
+import json
 
 # main
 def main():
-    project_gui = gui.GUI([QUESTION1, QUESTION2, QUESTION3]) # call game 
+
+    # read questions from json
+    questions = []
+    with open("questions.json", "r") as qf:
+        questions = json.load(qf)
+
+        # convert difficulties to ints
+        for q in questions: 
+            q["difficulty"]=gui.DIFF_MAP[q["difficulty"]]
+
+    project_gui = gui.GUI(questions) # call game 
     print(project_gui.answers_list)
+    print("SCORE:", project_gui.score)
 
 #     # create df from results
 #     if 1 == 0:
