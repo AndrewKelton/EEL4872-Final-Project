@@ -13,25 +13,25 @@ import pandas as pd
 import json
 
 
-class QuestionNode: 
-
-    def __init__(self, question_data, correct_child=None, incorrect_child=None):
-        self.question_data = question_data  # dict with question info
-        self.correct_child = correct_child
-        self.incorrect_child = incorrect_child
-
-def load_tree_from_dict(data):
-    if data is None:
-        return None
-    question_data = data["question_data"]
-    correct_child = load_tree_from_dict(data.get("correct_child"))
-    incorrect_child = load_tree_from_dict(data.get("incorrect_child"))
-    return QuestionNode(question_data, correct_child, incorrect_child)
-
-def load_tree_from_file(file):
-    with open(file, 'r') as f:
-        data = json.load(f)
-    return load_tree_from_dict(data)
+# class QuestionNode: 
+# 
+#     def __init__(self, question_data, correct_child=None, incorrect_child=None):
+#         self.question_data = question_data  # dict with question info
+#         self.correct_child = correct_child
+#         self.incorrect_child = incorrect_child
+# 
+# def load_tree_from_dict(data):
+#     if data is None:
+#         return None
+#     question_data = data["question_data"]
+#     correct_child = load_tree_from_dict(data.get("correct_child"))
+#     incorrect_child = load_tree_from_dict(data.get("incorrect_child"))
+#     return QuestionNode(question_data, correct_child, incorrect_child)
+# 
+# def load_tree_from_file(file):
+#     with open(file, 'r') as f:
+#         data = json.load(f)
+#     return load_tree_from_dict(data)
 
 
 # main
@@ -46,7 +46,8 @@ def main():
         for q in questions: 
             q["difficulty"]=gui.DIFF_MAP[q["difficulty"]]
 
-    project_gui = gui.GUI(questions) # call game 
+    project_gui = gui.GUI(questions)
+    project_gui.start_test()
     print(project_gui.answers_list)
     print("SCORE:", project_gui.score)
 

@@ -38,6 +38,7 @@ def main():
 
     root_node = load_tree_from_file("questions-tree.json")
     app = gui.GUI(root_node)
+    app.start_test()
 
 #     # create df from results
 #     if 1 == 0:

@@ -61,6 +61,10 @@ class GUI:
 
     def __init__(self, questions : List[Dict[str, Any]]):
 
+        # create Tkinter object
+        self.root=tk.Tk()
+        self.root.withdraw() # hide main window
+
         # set initial values
         self.num_of_questions = len(questions)
         self.questions = questions
@@ -81,20 +85,40 @@ class GUI:
             }
         '''
 
-        # create Tkinter object
-        self.root=tk.Tk()
-        self.root.withdraw() # hide main window
+    def start_test(self) -> None:
+        try:
+            # welcome task
+            self.__get_username()
+            self.root.deiconify()
 
-        # welcome task
-        self.get_username()
-        self.root.deiconify()
+            # build ui components
+            self.__build_main_ui()
+            self.__build_menu_ui()
+        except Exception as e:
 
-        # build ui components
-        self.build_menu_ui()
-        self.build_main_ui()
+            # menubar glitch, this ignores it
+            if str(e).find("menu") != -1:
+                return
 
+            # print the error
+            import tkinter.messagebox as msg
+            msg.showerror("Error", f"Something went wrong:\n{e}")
+
+            try:
+                if hasattr(self, 'header_frame') and self.header_frame.winfo_exists():
+                    self.header_frame.destroy()
+                if hasattr(self, 'question_label') and self.question_label.winfo_exists():
+                    self.question_label.destroy()
+                if hasattr(self, 'button_grid_frame') and self.button_grid_frame.winfo_exists():
+                    self.button_grid_frame.destroy()
+                if self.root and self.root.winfo_exists():
+                    self.root.destroy()
+            except Exception as destroy_err:
+                print(f"Error while cleaning up UI: {destroy_err}")
+            
+        
     # build the main ui
-    def build_main_ui(self) -> None:
+    def __build_main_ui(self) -> None:
         logging.debug("Building Main UI") # print debug
 
         self.root.title(f"{self.username.title()}'s Cognitive Test") # title
@@ -127,17 +151,17 @@ class GUI:
         self.question_label.pack(expand=True, fill="both", padx=10, pady=10)
 
         # button grid to answer questions
-        self.button_grid = self.ButtonGrid(self.root, self.answer_selected)
+        self.button_grid = self.__ButtonGrid(self.root, self.__answer_selected)
         self.button_grid_frame = self.button_grid.buttonframe
 
-        self.load_question() # load the first question
+        self.__load_question() # load the first question
  
         # close window
-        self.root.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(self.root))
+        self.root.protocol("WM_DELETE_WINDOW", lambda: self.__on_closing(self.root))
         self.root.mainloop()
 
     # build the menu bar ui
-    def build_menu_ui(self) -> None:
+    def __build_menu_ui(self) -> None:
         logging.debug("Building Menu UI") # print debug
 
         # menu bar configuration
@@ -145,20 +169,20 @@ class GUI:
 
         # file menu configuration
         self.filemenu=tk.Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Close", command=self.on_closing)
+        self.filemenu.add_command(label="Close", command=self.__on_closing)
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Close Without Question", command=exit)
+        self.filemenu.add_command(label="Close Without Question", command=self.__close_without_prompt)
         self.root.config(menu=self.menubar)
 
         # action bar configuration
         self.actionmenu=tk.Menu(self.menubar, tearoff=0)
-        self.actionmenu.add_command(label="Show Message", command=self.show_message)
+        self.actionmenu.add_command(label="Show Message", command=self.__show_message)
 
         self.menubar.add_cascade(menu=self.filemenu, label="File")
         self.menubar.add_cascade(menu=self.actionmenu, label="Action")
 
     # get username from user
-    def get_username(self) -> None:
+    def __get_username(self) -> None:
         logging.debug("Collecting Username") # print debug
 
         self.username=None
@@ -169,7 +193,7 @@ class GUI:
         logging.info(f"User: {self.username} started test.")
 
     # load question into window
-    def load_question(self) -> None:
+    def __load_question(self) -> None:
         self.start_time = time.time()
         
         # update question counter
@@ -188,7 +212,7 @@ class GUI:
         self.button_grid.set_answers(choices)
 
     # callback function when a button in grid is pressed
-    def answer_selected(self, chosen_idx : int) -> None:
+    def __answer_selected(self, chosen_idx : int) -> None:
         end_time = time.time()
         time_taken = end_time - self.start_time
 
@@ -236,22 +260,22 @@ class GUI:
         
         # more questions to complete
         if len(self.questions) > 0 and self.current_question < self.num_of_questions:
-            self.load_question() 
+            self.__load_question() 
         
         # all questions have been completed
         else:
             messagebox.showinfo("Done!", "You have completed all questions!")
-            self.results_screen()
+            self.__results_screen()
 
     # print message to terminal
-    def show_message(self):
+    def __show_message(self) -> None:
         if self.check_state.get() == 0:
             print(self.textbox.get('1.0', tk.END)) # prints inputted message to terminal
         else:
             messagebox.showinfo(title="Message", message=self.textbox.get('1.0', tk.END)) # shows a messagebox
 
     # results screen when quiz finishes
-    def results_screen(self):
+    def __results_screen(self) -> None:
         self.root.destroy() # destroy quiz window 
 
         # create results window
@@ -280,16 +304,26 @@ class GUI:
         score_label.pack(pady=10)
 
         # close window
-        result_wdw.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(result_wdw))
+        result_wdw.protocol("WM_DELETE_WINDOW", lambda: self.__on_closing(result_wdw))
         result_wdw.mainloop()
         
     # exit GUI & close window
-    def on_closing(self, window) -> None:
+    def __on_closing(self, window) -> None:
         if messagebox.askyesno(title="Quit", message="Do you really want to quit?"):
-            window.destroy()
+            try:
+                window.destroy()
+            except Exception as e:
+                logging.warning(f"Error: {e}")
+    
+    def __close_without_prompt(self) -> None:
+        try:
+            self.root.destroy()
+        except Exception as e:
+            logging.warning(f"Error: {e}")
+
 
     # ButtonGrid class for multiple choice questions
-    class ButtonGrid:
+    class __ButtonGrid:
         
         def __init__(self, root, click_callback):
 
