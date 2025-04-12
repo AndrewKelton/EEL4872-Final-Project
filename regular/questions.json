@@ -1,132 +1,188 @@
-[
-    {
-        "id": 0,
-        "difficulty": "low",
-        "question": "1 + 1 = ?",
-        "answer": 2,
-        "answer choices": [1,2,3,4]
-    },
-    {
-        "id": 1,
-        "difficulty": "low",
-        "question": "What color is the sky on a clear day?",
-        "answer": "blue",
-        "answer choices": ["red", "blue", "green", "yellow"]
-    },
-    {
-        "id": 2,
-        "difficulty": "low",
-        "question": "Which number comes after 3?",
-        "answer": 4,
-        "answer choices": [2, 3, 4, 5]
-    },
-    {
-        "id": 3,
-        "difficulty": "low",
-        "question": "What sound does a cat make?",
-        "answer": "meow",
-        "answer choices": ["woof", "meow", "quack", "moo"]
-    },
-    {
-        "id": 4,
-        "difficulty": "low",
-        "question": "Which shape has three sides?",
-        "answer": "triangle",
-        "answer choices": ["circle", "square", "triangle", "rectangle"]
-    },
-    {
-        "id": 5,
-        "difficulty": "medium",
-        "question": "To be inferior to someone means?",
-        "answer": "to be of lower status",
-        "answer choices": [
-          "to be of higher status",
-          "to be of lower status",
-          "to be poorer",
-          "to be equal to"
-        ]
-    },
-    {
-        "id": 6,
-        "difficulty": "medium",
-        "question": "What does it mean to procrastinate?",
-        "answer": "to delay doing something",
-        "answer choices": [
-          "to do something early",
-          "to finish quickly",
-          "to delay doing something",
-          "to avoid doing something completely"
-        ]
-    },
-    {
-        "id": 7,
-        "difficulty": "medium",
-        "question": "What is the best synonym for 'reluctant'?",
-        "answer": "unwilling",
-        "answer choices": [
-          "excited",
-          "unwilling",
-          "prepared",
-          "eager"
-        ]
-    },
-    {
-        "id": 8,
-        "difficulty": "medium",
-        "question": "To 'comprehend' a topic means to:",
-        "answer": "understand it",
-        "answer choices": [
-          "memorize it",
-          "question it",
-          "ignore it",
-          "understand it"
-        ]
-    },
-    {
-        "id": 9,
-        "difficulty": "medium",
-        "question": "What does it mean if someone is 'empathetic'?",
-        "answer": "they can understand others' feelings",
-        "answer choices": [
-          "they always agree with others",
-          "they enjoy being alone",
-          "they can understand others' feelings",
-          "they are very emotional"
-        ]
-    },
-    {
-        "id": 10,
-        "difficulty": "high",
-        "question": "What is the next number in the sequence: 2, 6, 12, 20, 30, __.",
-        "answer": 42,
-        "answer choices": [42, 40, 21, 43]
-    },
-    {
-        "id": 11,
-        "difficulty": "high",
-        "question": "If all bloops are razzies and all razzies are lazzies, are all bloops definitely lazzies?",
-        "answer": "Yes",
-        "answer choices": ["Yes", "No", "Cannot be determined", "Only some"]
-    },
-    {
-        "id": 12,
-        "difficulty": "high",
-        "question": "Which word is most opposite in meaning to 'ephemeral'?",
-        "answer": "eternal",
-        "answer choices": ["short", "eternal", "fleeting", "fragile"]
-    },
-    {
-        "id": 13,
-        "difficulty": "high",
-        "question": "Find the odd one out: Apple, Banana, Carrot, Grape",
-        "answer": "Carrot",
-        "answer choices": ["Apple", "Banana", "Carrot", "Grape"]
-    },
-    {
-        "id": 14,
-        "difficulty": "high",
-        "question": "Rearrange the letters ‘O U L T P’ to form the name of a(n):",
-        "answer": "planet",
-        "answer choices": ["animal", "planet", "continent", "country"]
-    }
-]
+{
+    "low": [
+        {
+            "id": 0,
+            "difficulty": "low",
+            "question": "1 + 1 = ?",
+            "answer": 2,
+            "answer choices": [
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "id": 1,
+            "difficulty": "low",
+            "question": "What color is the sky on a clear day?",
+            "answer": "blue",
+            "answer choices": [
+                "red",
+                "blue",
+                "green",
+                "yellow"
+            ]
+        },
+        {
+            "id": 2,
+            "difficulty": "low",
+            "question": "Which number comes after 3?",
+            "answer": 4,
+            "answer choices": [
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        {
+            "id": 3,
+            "difficulty": "low",
+            "question": "What sound does a cat make?",
+            "answer": "meow",
+            "answer choices": [
+                "woof",
+                "meow",
+                "quack",
+                "moo"
+            ]
+        },
+        {
+            "id": 4,
+            "difficulty": "low",
+            "question": "Which shape has three sides?",
+            "answer": "triangle",
+            "answer choices": [
+                "circle",
+                "square",
+                "triangle",
+                "rectangle"
+            ]
+        }
+    ],
+    "medium": [
+        {
+            "id": 5,
+            "difficulty": "medium",
+            "question": "To be inferior to someone means?",
+            "answer": "to be of lower status",
+            "answer choices": [
+                "to be of higher status",
+                "to be of lower status",
+                "to be poorer",
+                "to be equal to"
+            ]
+        },
+        {
+            "id": 6,
+            "difficulty": "medium",
+            "question": "What does it mean to procrastinate?",
+            "answer": "to delay doing something",
+            "answer choices": [
+                "to do something early",
+                "to finish quickly",
+                "to delay doing something",
+                "to avoid doing something completely"
+            ]
+        },
+        {
+            "id": 7,
+            "difficulty": "medium",
+            "question": "What is the best synonym for 'reluctant'?",
+            "answer": "unwilling",
+            "answer choices": [
+                "excited",
+                "unwilling",
+                "prepared",
+                "eager"
+            ]
+        },
+        {
+            "id": 8,
+            "difficulty": "medium",
+            "question": "To 'comprehend' a topic means to:",
+            "answer": "understand it",
+            "answer choices": [
+                "memorize it",
+                "question it",
+                "ignore it",
+                "understand it"
+            ]
+        },
+        {
+            "id": 9,
+            "difficulty": "medium",
+            "question": "What does it mean if someone is 'empathetic'?",
+            "answer": "they can understand others' feelings",
+            "answer choices": [
+                "they always agree with others",
+                "they enjoy being alone",
+                "they can understand others' feelings",
+                "they are very emotional"
+            ]
+        }
+    ],
+    "high": [
+        {
+            "id": 10,
+            "difficulty": "high",
+            "question": "What is the next number in the sequence: 2, 6, 12, 20, 30, __.",
+            "answer": 42,
+            "answer choices": [
+                42,
+                40,
+                21,
+                43
+            ]
+        },
+        {
+            "id": 11,
+            "difficulty": "high",
+            "question": "If all bloops are razzies and all razzies are lazzies, are all bloops definitely lazzies?",
+            "answer": "Yes",
+            "answer choices": [
+                "Yes",
+                "No",
+                "Cannot be determined",
+                "Only some"
+            ]
+        },
+        {
+            "id": 12,
+            "difficulty": "high",
+            "question": "Which word is most opposite in meaning to 'ephemeral'?",
+            "answer": "eternal",
+            "answer choices": [
+                "short",
+                "eternal",
+                "fleeting",
+                "fragile"
+            ]
+        },
+        {
+            "id": 13,
+            "difficulty": "high",
+            "question": "Find the odd one out: Apple, Banana, Carrot, Grape",
+            "answer": "Carrot",
+            "answer choices": [
+                "Apple",
+                "Banana",
+                "Carrot",
+                "Grape"
+            ]
+        },
+        {
+            "id": 14,
+            "difficulty": "high",
+            "question": "Rearrange the letters ‘O U L T P’ to form the name of a(n):",
+            "answer": "planet",
+            "answer choices": [
+                "animal",
+                "planet",
+                "continent",
+                "country"
+            ]
+        }
+    ]
+}
