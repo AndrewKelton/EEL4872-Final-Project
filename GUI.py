@@ -228,8 +228,9 @@ class GUI:
 
         logging.info(f"User: {self.username} started test.")
 
-    # load question into window
     def __load_question(self) -> None:
+        '''Loads a question into window'''
+
         self.start_time = time.time()
 
         # retrieve values
@@ -254,6 +255,14 @@ class GUI:
         self.button_grid.set_answers(choices)
 
     def __predict_and_get_next_question(self) -> Optional[Dict[str, Any]]:
+        ''' 
+            Predicts cognitive ability level ( LOW, MEDIUM, HIGH ) based on 
+            previous answer. Predicted cognitive ability level will then pop
+            the first question from the respective predicted cognitive ability
+            list and return it.
+        '''
+
+        # first question
         if not self.answers_list:
             return self.medium_questions.pop(0) \
                 if self.medium_questions else self.low_questions.pop(0) \
@@ -282,8 +291,12 @@ class GUI:
         else:
             return None
 
-    # callback function when a button in grid is pressed
     def __answer_selected(self, chosen_idx : int) -> None:
+        ''' 
+            Callback function when a button in grid is pressed 
+            (user answers a questions).
+        '''
+
         end_time = time.time()
         time_taken = end_time - self.start_time
 
@@ -335,15 +348,22 @@ class GUI:
     
         self.__load_question() # load next question to window
 
-    # print message to terminal
     def __show_message(self) -> None:
+        '''
+            Prints a message to terminal. 
+
+            Not sure of its usage anymore, I was using it 
+            previously and don't want to break the code.
+        '''
+
         if self.check_state.get() == 0:
             print(self.textbox.get('1.0', tk.END)) # prints inputted message to terminal
         else:
             messagebox.showinfo(title="Message", message=self.textbox.get('1.0', tk.END)) # shows a messagebox
 
-    # results screen when quiz finishes
     def __results_screen(self) -> None:
+        '''Results screen when quiz finishes'''
+
         self.root.destroy() # destroy quiz window 
 
         # create results window
@@ -369,9 +389,10 @@ class GUI:
         result_wdw.protocol("WM_DELETE_WINDOW", lambda: self.__on_closing(result_wdw))
         result_wdw.mainloop()
         
-    # exit GUI & close window with prompt
-    def __on_closing(self, window) -> None:
-        logging.debug("User: " + self.username + " closed window.") # print debug
+    def __on_closing(self, window : tk.Tk) -> None:
+        '''exit GUI & close window with prompt'''
+    
+        logging.debug(f"User: {self.username} closed window {window.winfo_id()}.") # print debug
 
         if messagebox.askyesno(title="Quit", message="Do you really want to quit?"):
             try:
@@ -379,16 +400,18 @@ class GUI:
             except Exception as e:
                 logging.warning(f"Error: {e}")
     
-    # exit GUI & close window without prompt
     def __close_without_prompt(self) -> None:
+        '''exit GUI & close window without prompt'''
+
+        logging.debug(f"User: {self.username} closed main window.") # print debug
+
         try:
             self.root.destroy()
         except Exception as e:
             logging.warning(f"Error: {e}")
 
-
-    # ButtonGrid class for multiple choice questions
     class __ButtonGrid:
+        '''ButtonGrid class for multiple choice questions'''
         
         def __init__(self, root, click_callback):
 
@@ -426,8 +449,9 @@ class GUI:
             self.buttonframe.pack(fill=tk.BOTH, expand=True)
             self.buttonframe.grid_propagate(False)
 
-        # set the answers to button grid from a grouping of questions
         def set_answers(self, answers : list) -> None:
+            '''set the answers to button grid from a grouping of questions'''
+
             logging.debug("Setting New Answers") # print debug
 
             random_answers = sample(answers, 4) # randomize answer choices
@@ -437,12 +461,13 @@ class GUI:
                 for j in range(2):
                     self.grid[i][j].config(text=random_answers.pop(0))
         
-        # return the answer choice's value
-        def get_chosen_answer(self, answer_idx) -> any:
+        def get_chosen_answer(self, answer_idx : int) -> any:
+            '''return the answer choice's value'''
             return self.get_button_from_1d_idx(answer_idx).cget("text")
         
-        # returns button from grid index chosen
-        def get_button_from_1d_idx(self, idx) -> tk.Button:
+        def get_button_from_1d_idx(self, idx : int) -> tk.Button:
+            '''returns button from grid index chosen'''
+
             if idx == 0:
                 return self.grid[0][0]
             elif idx == 1:

@@ -15,7 +15,7 @@ import numpy as np
 import json
 import sys
 
-# dummy training data
+# dummy training data, or control data
 dummy_X = [
     # [correct ? 1 : 0, question difficulty, time_took]
     [1, gui.LOW, 5.0],
