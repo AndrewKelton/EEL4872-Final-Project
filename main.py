@@ -35,16 +35,16 @@ dummy_y = [
     "medium"
 ]
 
-
-# reads and returns contents of json file
 def read_json(file_name : str):
+    '''reads and returns contents of json file'''
     with open(file_name, "r") as jf:
         return json.load(jf)
 
-''' Read questions from JSON file and returns
-    a triple of lists containing low-high questions.
-'''
 def get_questions(file_name : str):
+    ''' Read questions from JSON file and returns
+        a triple of lists containing low-high questions.
+    '''
+
     data = read_json(file_name)
 
     # convert difficulties to ints
@@ -54,10 +54,12 @@ def get_questions(file_name : str):
 
     return data["low"], data["medium"], data["high"]
 
-''' Reads answers from previous tests in data folder. Returns
-    tuple of prepared X, y training data set for model.
-'''
+
 def get_answers_to_X_y(folder_path: str = "data"):
+    ''' 
+        Reads answers from previous tests in data folder. Returns
+        tuple of prepared X, y training data set for model.
+    '''
     import os 
 
     X, y = [], []

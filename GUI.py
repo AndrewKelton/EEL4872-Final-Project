@@ -103,8 +103,8 @@ class GUI:
         self.root=tk.Tk()    # create Tkinter object
         self.root.withdraw() # hide main window
 
-    # Starts the cognitive ability test
     def start_test(self) -> None:
+        '''Starts the cognitive ability test'''
 
         try:
             # welcome task
@@ -137,9 +137,8 @@ class GUI:
             except Exception as destroy_err:
                 print(f"Error while cleaning up UI: {destroy_err}")
             
-        
-    # build the main ui
     def __build_main_ui(self) -> None:
+        '''build the main ui'''
         logging.debug("Building Main UI") # print debug
 
         self.root.title(f"{self.username.title()}'s Cognitive Test") # title
@@ -193,8 +192,8 @@ class GUI:
         self.root.protocol("WM_DELETE_WINDOW", lambda: self.__on_closing(self.root))
         self.root.mainloop()
 
-    # build the menu bar ui
     def __build_menu_ui(self) -> None:
+        '''build the menu bar ui'''
         logging.debug("Building Menu UI") # print debug
 
         # menu bar configuration
