@@ -16,6 +16,8 @@ User Interface for EEL 4872 Final Project
 # general imports
 from typing import List, Dict, Any, Optional
 from random import sample, shuffle
+from numpy import log
+from collections import Counter
 import time
 
 # gui module import
@@ -38,7 +40,8 @@ DF="difficulty"
 
 # indexes for variables in lists
 INCORRECT=ID_=0
-CORRECT=AN_=1
+CORRECT=10
+AN_=1
 RS=2
 
 # cognitive ability levels & their mapping
@@ -79,6 +82,8 @@ class GUI:
         self.model = model # set model
 
         # initalize values
+        self.X_all = []
+        self.determined = False
         self.current_question = 0
         self.score = 0          # not sure what to do with this rn
         self.correct_count = 0  # not sure what to do with this rn
@@ -138,7 +143,8 @@ class GUI:
                 print(f"Error while cleaning up UI: {destroy_err}")
             
     def __build_main_ui(self) -> None:
-        '''build the main ui'''
+        '''Build the main ui'''
+
         logging.debug("Building Main UI") # print debug
 
         self.root.title(f"{self.username.title()}'s Cognitive Test") # title
@@ -193,7 +199,8 @@ class GUI:
         self.root.mainloop()
 
     def __build_menu_ui(self) -> None:
-        '''build the menu bar ui'''
+        '''Build the menu bar ui'''
+
         logging.debug("Building Menu UI") # print debug
 
         # menu bar configuration
@@ -216,8 +223,9 @@ class GUI:
         self.menubar.protocal("WM_DELETE_WINDOW", lambda: self.__on_closing(self.root))
         self.menubar.mainloop()
 
-    # get username from user
     def __get_username(self) -> None:
+        '''Get username from user and save it'''
+
         logging.debug("Collecting Username") # print debug
 
         self.username=None
@@ -270,11 +278,14 @@ class GUI:
         
         # previous_answer
         prev_answer = self.answers_list[-1]
-        X = [[
+        X_tmp = [[
             1 if prev_answer["result"] == CORRECT else INCORRECT,
             prev_answer["difficulty"],
             prev_answer["time_taken"]
         ]]
+        # X = [[x[0], x[1], log(x[2] + 1)] for x in X_tmp] # normalize time
+        X = [[self.compute_weighted_correct(x[0], x[2]), x[1], log(x[2] + 1)] for x in X_tmp] # normalize time
+        self.X_all.extend(X) # extend total X data for final classification
 
         prediction = self.model.predict(X)[0]  # returns "low", "medium", or "high"
         self.predicted_difficulty = prediction # save prediction
@@ -376,10 +387,10 @@ class GUI:
         )
         label.pack(pady=20)
 
-        # predicted label
+        # predicted label, overall predicted cognitive ability
         predict_label = tk.Label(
             result_wdw,
-            text=f"Cognitive Ability: {self.predicted_difficulty}",
+            text=f"Determined Cognitive Ability: {self.__get_final_prediction()}",
             font=('Arial', BUTTON_FONT_SIZE)
         )
         predict_label.pack(pady=10)
@@ -387,6 +398,25 @@ class GUI:
         # close window
         result_wdw.protocol("WM_DELETE_WINDOW", lambda: self.__on_closing(result_wdw))
         result_wdw.mainloop()
+    
+    def __get_final_prediction(self) -> str:
+        '''
+            Determine the user's overall cognitive ability.
+            Counts all predicted/selected cognitive abilities
+            between each question and returns the cognitive ability
+            that was predicted most often.
+        '''
+        predictions = self.model.predict(self.X_all)
+        prediction_counts = Counter(predictions)
+        print(f"Prediction Breakdown: {dict(prediction_counts)}")
+
+        most_common = prediction_counts.most_common(2)
+        if len(most_common) < 2 or most_common[0][1] > most_common[1][1]:
+            self.determined = True
+            return most_common[0][0].upper()
+        else:
+            self.determined = False
+            return "UNDETERMINED please take again."
         
     def __on_closing(self, window : tk.Tk) -> None:
         '''exit GUI & close window with prompt'''
@@ -408,6 +438,11 @@ class GUI:
             self.root.destroy()
         except Exception as e:
             logging.warning(f"Error: {e}")
+
+    def compute_weighted_correct(self, is_correct : int, time_taken : float) -> int:
+        if is_correct:
+            return 10 if time_taken < 6 else 7 if time_taken < 10 else 5 
+        return 0
 
     class __ButtonGrid:
         '''ButtonGrid class for multiple choice questions'''

@@ -1,0 +1,90 @@
+[
+    {
+        "id": 8,
+        "selected_answer": "understand it",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 7.091329097747803,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 12,
+        "selected_answer": "fleeting",
+        "result": 0,
+        "difficulty": 2,
+        "time_taken": 1.2063281536102295,
+        "predicted_difficulty": "high"
+    },
+    {
+        "id": 0,
+        "selected_answer": 2,
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 1.4933545589447021,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 6,
+        "selected_answer": "to finish quickly",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 3.3516998291015625,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 2,
+        "selected_answer": 5,
+        "result": 0,
+        "difficulty": 0,
+        "time_taken": 2.5567119121551514,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 3,
+        "selected_answer": "moo",
+        "result": 0,
+        "difficulty": 0,
+        "time_taken": 1.231092929840088,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 1,
+        "selected_answer": "blue",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 0.8725666999816895,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 9,
+        "selected_answer": "they can understand others' feelings",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 5.900106906890869,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 11,
+        "selected_answer": "No",
+        "result": 0,
+        "difficulty": 2,
+        "time_taken": 1.365859031677246,
+        "predicted_difficulty": "high"
+    },
+    {
+        "id": 4,
+        "selected_answer": "triangle",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 1.8052029609680176,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 7,
+        "selected_answer": "prepared",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 2.528409957885742,
+        "predicted_difficulty": "medium"
+    }
+]

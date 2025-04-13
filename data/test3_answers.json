@@ -1,0 +1,122 @@
+[
+    {
+        "id": 5,
+        "selected_answer": "to be of lower status",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 1.2604060173034668,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 10,
+        "selected_answer": 43,
+        "result": 0,
+        "difficulty": 2,
+        "time_taken": 1.031836986541748,
+        "predicted_difficulty": "high"
+    },
+    {
+        "id": 4,
+        "selected_answer": "triangle",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 5.200813055038452,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 9,
+        "selected_answer": "they are very emotional",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 1.1645948886871338,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 1,
+        "selected_answer": "blue",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 1.405134916305542,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 7,
+        "selected_answer": "unwilling",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 2.080740213394165,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 11,
+        "selected_answer": "Yes",
+        "result": 10,
+        "difficulty": 2,
+        "time_taken": 1.603853702545166,
+        "predicted_difficulty": "high"
+    },
+    {
+        "id": 14,
+        "selected_answer": "continent",
+        "result": 0,
+        "difficulty": 2,
+        "time_taken": 1.1842329502105713,
+        "predicted_difficulty": "high"
+    },
+    {
+        "id": 3,
+        "selected_answer": "meow",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 11.24474811553955,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 2,
+        "selected_answer": 4,
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 1.4715170860290527,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 8,
+        "selected_answer": "understand it",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 2.6144399642944336,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 12,
+        "selected_answer": "fleeting",
+        "result": 0,
+        "difficulty": 2,
+        "time_taken": 1.0339770317077637,
+        "predicted_difficulty": "high"
+    },
+    {
+        "id": 0,
+        "selected_answer": 2,
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 1.4135022163391113,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 6,
+        "selected_answer": "to delay doing something",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 3.2954471111297607,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 13,
+        "selected_answer": "Carrot",
+        "result": 10,
+        "difficulty": 2,
+        "time_taken": 1.6783950328826904,
+        "predicted_difficulty": "high"
+    }
+]

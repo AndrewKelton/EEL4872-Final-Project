@@ -17,23 +17,29 @@ import sys
 
 # dummy training data, or control data
 dummy_X = [
-    # [correct ? 1 : 0, question difficulty, time_took]
-    [1, gui.LOW, 5.0],
-    [0, gui.LOW, 10.0],
-    [1, gui.MEDIUM, 7.5],
-    [0, gui.MEDIUM, 12.0],
-    [1, gui.HIGH, 3.0],
-    [0, gui.HIGH, 15.0]
+    [10, gui.LOW, 4.0],
+    [10, gui.MEDIUM, 4.0],
+    [10, gui.HIGH, 4.0],
+
+    [0, gui.LOW, 4.0],
+    [0, gui.MEDIUM, 4.0],
+    [0, gui.HIGH, 4.0]
 ]
 # result of answer
 dummy_y = [
-    "medium",
-    "low",
-    "high",
-    "low",
-    "high",
-    "medium"
+    "medium",  # correct LOW fast → not low, not high
+    "high",    # correct MED fast → high potential
+    "high",    # correct HIGH fast → high
+
+    "low",     # wrong LOW
+    "low",     # wrong MED
+    "medium"   # wrong HIGH → tried hard, but maybe not lowest
 ]
+
+def compute_weighted_correct(is_correct : int, time_taken : float) -> int:
+    if is_correct:
+        return 10 if time_taken < 6 else 7 if time_taken < 10 else 5 
+    return 0
 
 def read_json(file_name : str):
     '''reads and returns contents of json file'''
@@ -57,7 +63,8 @@ def get_questions(file_name : str):
 
 def get_answers_to_X_y(folder_path: str = "data"):
     ''' 
-        Reads answers from previous tests in data folder. Returns
+        Reads answers from previous tests in data folder and 
+        turns them to the true value to label y. Returns
         tuple of prepared X, y training data set for model.
     '''
     import os 
@@ -75,13 +82,21 @@ def get_answers_to_X_y(folder_path: str = "data"):
                 # read and append answer data
                 for answer in data:
                     try:
-                        result = int(answer['result'])
+                        result = compute_weighted_correct(int(answer['result']), float(answer['time_taken']))
                         difficulty = int(answer['difficulty'])
                         time_taken_logged = np.log(float(answer['time_taken']) + 1) # normalize time with log
-                        predicted_difficulty = str(answer['predicted_difficulty'])
+                        # predicted_difficulty = str(answer['predicted_difficulty'])
+
+                        # assign label based on actual performance, not prediction
+                        if result == gui.CORRECT and difficulty >= gui.MEDIUM:
+                            label = "high"
+                        elif result == gui.CORRECT:
+                            label = "medium"
+                        else:
+                            label = "low"
 
                         X.append([result, difficulty, time_taken_logged])
-                        y.append(predicted_difficulty)
+                        y.append(label)
 
                     except (KeyError, ValueError, TypeError) as e:
                         print(f"Skipping bad entry in {filename}: {e}")
@@ -106,14 +121,16 @@ def main():
         '''
         X_train, y_train = get_answers_to_X_y()
 
-    dummy_X_logged = [[x[0], x[1], np.log(x[2] + 1)] for x in dummy_X]
+    # normalize control data and extend training set
+    dummy_X_logged = [[compute_weighted_correct(x[0], x[2]), x[1], np.log(x[2] + 1)] for x in dummy_X]
     X_train.extend(dummy_X_logged)
     y_train.extend(dummy_y)
     
+    model=DecisionTreeClassifier(class_weight="balanced")
     # evaluate the model
     if len(X_train) >= 5:  # only evaluate if we have enough samples
         X_train_split, X_test, y_train_split, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
-        model = DecisionTreeClassifier()
+        # model = DecisionTreeClassifier()
         model.fit(X_train_split, y_train_split)
         y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
@@ -131,12 +148,12 @@ def main():
         print("-------------------------------------------------------------")
         print("Not enough data to evaluate accuracy, training with full set.")
         print("-------------------------------------------------------------")
-        
-        model = DecisionTreeClassifier()
-        model.fit(X_train, y_train)
+        # 
+        # # model = DecisionTreeClassifier()
+        # model.fit(X_train, y_train)
     
     # initialize and train the model
-    model=DecisionTreeClassifier()
+    # model=DecisionTreeClassifier()
     model.fit(X_train, y_train)
 
     # initialize GUI and start test
@@ -148,9 +165,10 @@ def main():
 
     # save answers and predictions to JSON file if answers exists
     if not project_gui.answers_list is None and len(project_gui.answers_list) > 0:
-        file_name = 'data/' + project_gui.username.lower() + '_answers.json'
-        with open(file_name, 'w') as out_jf:
-            json.dump(project_gui.answers_list, out_jf, indent=4)
+        if project_gui.determined: # only save if cognitive ability is determined
+            file_name = 'data/' + project_gui.username.lower() + '_answers.json'
+            with open(file_name, 'w') as out_jf:
+                json.dump(project_gui.answers_list, out_jf, indent=4)
 
 
 if __name__ == '__main__':
