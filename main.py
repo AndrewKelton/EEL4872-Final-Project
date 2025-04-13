@@ -8,6 +8,7 @@ import GUI as gui
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
 
 # import pandas as pd
 import numpy as np
@@ -114,6 +115,11 @@ def main():
         model.fit(X_train_split, y_train_split)
         y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
+
+        # save classification metrics
+        with open("training_predictions.log", "w") as log:
+            log.write("\t\t\t\t\t\t--- Classification Report ---\n")
+            log.write(classification_report(y_test, y_pred))
 
         print("--------------------------------")
         print(f"   Model Test Accuracy: {accuracy:.2f}")
