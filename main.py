@@ -1,0 +1,149 @@
+# main.py
+# Author: Andrew Kelton
+
+# import my gui
+import GUI as gui
+
+# import DT modules
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# import pandas as pd
+import numpy as np
+import json
+import sys
+
+# dummy training data
+dummy_X = [
+    # [correct ? 1 : 0, question difficulty, time_took]
+    [1, gui.LOW, 5.0],
+    [0, gui.LOW, 10.0],
+    [1, gui.MEDIUM, 7.5],
+    [0, gui.MEDIUM, 12.0],
+    [1, gui.HIGH, 3.0],
+    [0, gui.HIGH, 15.0]
+]
+# result of answer
+dummy_y = [
+    "medium",
+    "low",
+    "high",
+    "low",
+    "high",
+    "medium"
+]
+
+
+# reads and returns contents of json file
+def read_json(file_name : str):
+    with open(file_name, "r") as jf:
+        return json.load(jf)
+
+''' Read questions from JSON file and returns
+    a triple of lists containing low-high questions.
+'''
+def get_questions(file_name : str):
+    data = read_json(file_name)
+
+    # convert difficulties to ints
+    for ability, question_list in data.items():
+        for q in question_list:
+            q["difficulty"]=gui.DIFF_MAP[q["difficulty"]]
+
+    return data["low"], data["medium"], data["high"]
+
+''' Reads answers from previous tests in data folder. Returns
+    tuple of prepared X, y training data set for model.
+'''
+def get_answers_to_X_y(folder_path: str = "data"):
+    import os 
+
+    X, y = [], []
+
+    # loop through all files in the folder
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".json"):
+            file_path = os.path.join(folder_path, filename)
+            
+            try:
+                data = read_json(file_path)
+
+                # read and append answer data
+                for answer in data:
+                    try:
+                        result = int(answer['result'])
+                        difficulty = int(answer['difficulty'])
+                        time_taken_logged = np.log(float(answer['time_taken']) + 1) # normalize time with log
+                        predicted_difficulty = str(answer['predicted_difficulty'])
+
+                        X.append([result, difficulty, time_taken_logged])
+                        y.append(predicted_difficulty)
+
+                    except (KeyError, ValueError, TypeError) as e:
+                        print(f"Skipping bad entry in {filename}: {e}")
+            
+            except Exception as e:
+                print(f"Error: {e}, Reading: {file_path}", sys.stderr)
+
+    return X, y
+
+# main
+def main():
+
+    # read questions from json file
+    low_questions, medium_questions, high_questions = get_questions("questions.json")
+
+    X_train, y_train=[], []
+    if len(sys.argv) > 1:
+        print('reading file')
+        ''' If there is any command line input, read and prepare 
+            previous answers from previous tests in 'data/'. This 
+            will be our training data to train the Decision Tree.
+        '''
+        X_train, y_train = get_answers_to_X_y()
+
+    dummy_X_logged = [[x[0], x[1], np.log(x[2] + 1)] for x in dummy_X]
+    X_train.extend(dummy_X_logged)
+    y_train.extend(dummy_y)
+    
+    # evaluate the model
+    if len(X_train) >= 5:  # only evaluate if we have enough samples
+        X_train_split, X_test, y_train_split, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+        model = DecisionTreeClassifier()
+        model.fit(X_train_split, y_train_split)
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+
+        print("--------------------------------")
+        print(f"   Model Test Accuracy: {accuracy:.2f}")
+        print("--------------------------------")
+
+    else:
+        print("-------------------------------------------------------------")
+        print("Not enough data to evaluate accuracy, training with full set.")
+        print("-------------------------------------------------------------")
+        
+        model = DecisionTreeClassifier()
+        model.fit(X_train, y_train)
+    
+    # initialize and train the model
+    model=DecisionTreeClassifier()
+    model.fit(X_train, y_train)
+
+    # initialize GUI and start test
+    project_gui = gui.GUI(low_questions,
+                          medium_questions, 
+                          high_questions, 
+                          model)
+    project_gui.start_test()
+
+    # save answers and predictions to JSON file if answers exists
+    if not project_gui.answers_list is None and len(project_gui.answers_list) > 0:
+        file_name = 'data/' + project_gui.username.lower() + '_answers.json'
+        with open(file_name, 'w') as out_jf:
+            json.dump(project_gui.answers_list, out_jf, indent=4)
+
+
+if __name__ == '__main__':
+    main()

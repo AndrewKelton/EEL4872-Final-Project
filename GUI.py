@@ -14,8 +14,8 @@ User Interface for EEL 4872 Final Project
 '''
 
 # general imports
-from typing import List, Dict, Any
-from random import sample
+from typing import List, Dict, Any, Optional
+from random import sample, shuffle
 import time
 
 # gui module import
@@ -60,29 +60,31 @@ BUTTON_FONT_SIZE=22
 class GUI:
 
     def __init__(self, 
-                 questions : List[Dict[str, Any]], 
                  low_questions : List[Dict[str, Any]], 
                  medium_questions : List[Dict[str, Any]], 
                  high_questions : List[Dict[str, Any]],
                  model
                 ):
 
-        # create Tkinter object
-        self.root=tk.Tk()
-        self.root.withdraw() # hide main window
-
-        # set initial values
-        self.num_of_questions = len(questions)
-        self.questions = questions
+        # set questions
         self.low_questions = low_questions
         self.medium_questions = medium_questions
         self.high_questions = high_questions
 
-        self.current_question= self.score = self.correct_count = 0
-        self.start_time = None
-        self.possible_score = 0
+        # shuffle questions
+        shuffle(self.low_questions)
+        shuffle(self.medium_questions)
+        shuffle(self.high_questions)
 
-        self.model = model
+        self.model = model # set model
+
+        # initalize values
+        self.current_question = 0
+        self.score = 0          # not sure what to do with this rn
+        self.correct_count = 0  # not sure what to do with this rn
+        self.start_time = None
+        self.possible_score = 0 # not sure what to do with this rn
+        self.predicted_difficulty = "medium" # initial prediction, always medium
 
         # results of answering a question(s)
         self.answers_list = []
@@ -98,7 +100,12 @@ class GUI:
             }
         '''
 
+        self.root=tk.Tk()    # create Tkinter object
+        self.root.withdraw() # hide main window
+
+    # Starts the cognitive ability test
     def start_test(self) -> None:
+
         try:
             # welcome task
             self.__get_username()
@@ -107,13 +114,13 @@ class GUI:
             # build ui components
             self.__build_main_ui()
             self.__build_menu_ui()
-        except Exception as e:
 
+        except Exception as e:
             # menubar glitch, this ignores it
             if str(e).find("menu") != -1:
                 return
 
-            # print the error
+            # print error
             import tkinter.messagebox as msg
             msg.showerror("Error", f"Something went wrong:\n{e}")
 
@@ -126,6 +133,7 @@ class GUI:
                     self.button_grid_frame.destroy()
                 if self.root and self.root.winfo_exists():
                     self.root.destroy()
+
             except Exception as destroy_err:
                 print(f"Error while cleaning up UI: {destroy_err}")
             
@@ -147,11 +155,23 @@ class GUI:
             text=f"{self.username.title()}'s Cognitive Test", 
             font=('Arial',TITLE_FONT_SIZE)
         )
-        self.label.pack(padx=10,pady=10,side=tk.LEFT)
+        self.label.pack(padx=10,pady=10)
 
         # question count
-        self.counter_label=tk.Label(self.header_frame, text="", font=('Arial', 14))
+        self.counter_label=tk.Label(
+            self.header_frame, 
+            text="", 
+            font=('Arial', 14)
+        )
         self.counter_label.pack(padx=10,pady=10,side=tk.RIGHT)
+
+        # current cognitive ability prediction
+        self.cognitive_label = tk.Label(
+            self.header_frame,
+            text=f"Cognitive Ability: {self.predicted_difficulty}",
+            font=('Arial', 14)
+        )
+        self.cognitive_label.pack(padx=10, pady=10, side=tk.LEFT)
 
         # question label
         self.question_label=tk.Label(
@@ -194,6 +214,9 @@ class GUI:
         self.menubar.add_cascade(menu=self.filemenu, label="File")
         self.menubar.add_cascade(menu=self.actionmenu, label="Action")
 
+        self.menubar.protocal("WM_DELETE_WINDOW", lambda: self.__on_closing(self.root))
+        self.menubar.mainloop()
+
     # get username from user
     def __get_username(self) -> None:
         logging.debug("Collecting Username") # print debug
@@ -208,12 +231,18 @@ class GUI:
     # load question into window
     def __load_question(self) -> None:
         self.start_time = time.time()
-        
-        # update question counter
-        self.counter_label.config(text=f"Question {self.current_question + 1} of {self.num_of_questions}")
 
         # retrieve values
-        self.current_question_dir = self.questions.pop(0)
+        self.current_question_dir = self.__predict_and_get_next_question()
+        if not self.current_question_dir:
+            messagebox.showinfo("Done!", "You have completed all questions!")
+            self.__results_screen()
+            return
+
+        # update question counter
+        self.current_question += 1
+        self.counter_label.config(text=f"Question {self.current_question}")
+        
         question_id = self.current_question_dir[ID] 
         question = self.current_question_dir[QN]
         choices = self.current_question_dir[AC]
@@ -224,6 +253,35 @@ class GUI:
         self.question_label.config(text=question)
         self.button_grid.set_answers(choices)
 
+    def __predict_and_get_next_question(self) -> Optional[Dict[str, Any]]:
+        if not self.answers_list:
+            return self.medium_questions.pop(0) \
+                if self.medium_questions else self.low_questions.pop(0) \
+                if self.low_questions else self.high_questions.pop(0) \
+                if self.high_questions else None
+        
+        # previous_answer
+        prev_answer = self.answers_list[-1]
+        X = [[
+            1 if prev_answer["result"] == CORRECT else INCORRECT,
+            prev_answer["difficulty"],
+            prev_answer["time_taken"]
+        ]]
+
+        prediction = self.model.predict(X)[0]  # returns "low", "medium", or "high"
+        self.predicted_difficulty = prediction # save prediction
+
+        self.cognitive_label.config(text=f"Cognitive Ability: {self.predicted_difficulty}")
+
+        if prediction == "low" and self.low_questions:
+            return self.low_questions.pop(0)
+        elif prediction == "medium" and self.medium_questions:
+            return self.medium_questions.pop(0)
+        elif prediction == "high" and self.high_questions:
+            return self.high_questions.pop(0)
+        else:
+            return None
+
     # callback function when a button in grid is pressed
     def __answer_selected(self, chosen_idx : int) -> None:
         end_time = time.time()
@@ -232,8 +290,8 @@ class GUI:
         question = self.current_question_dir 
         question_id = question[ID]
 
-        selected_answer=self.button_grid.get_chosen_answer(chosen_idx) # collect answered value
-        correct_answer =question[AN] # collect correct value
+        selected_answer= self.button_grid.get_chosen_answer(chosen_idx) # collect answered value
+        correct_answer = question[AN] # collect correct value
 
         logging.info(f"Question ID: {question_id}\tAnswered: '{selected_answer}'\tAnswer: '{correct_answer}'") # print debug
 
@@ -242,22 +300,27 @@ class GUI:
         # user's answer correct
         if selected_answer == correct_answer:
 
-            self.correct_count += 1        # increment correct count
-            self.score += question[DF] + 1 # increase user's score
+            self.correct_count += 1            # increment correct count
+            self.score += question[DF] * 2 + 1 # increase user's score
             self.answers_list.append({
                 "id": question_id, 
                 "selected_answer": selected_answer, 
                 "result": CORRECT, 
                 "difficulty": question[DF], 
-                "time_taken": time_taken
+                "time_taken": time_taken,
+                "predicted_difficulty": self.predicted_difficulty
             })
             messagebox.showinfo("Correct", "good job!")
 
         # user's answer incorrect
         else:
 
-            # remove a point if difficulty is low
+            # remove 2 points if difficulty is low
             if question[DF] == LOW:
+                self.score -= 2
+
+            # remove 1 point if difficulty is medium
+            elif question[DF] == MEDIUM:
                 self.score -= 1
             
             self.answers_list.append({
@@ -265,20 +328,12 @@ class GUI:
                 "selected_answer": selected_answer, 
                 "result": INCORRECT, 
                 "difficulty": question[DF], 
-                "time_taken": time_taken
+                "time_taken": time_taken,
+                "predicted_difficulty": self.predicted_difficulty
             })
             messagebox.showwarning("Incorrect", f"The correct answer was {correct_answer}.")
     
-        self.current_question += 1 # increment current question count
-        
-        # more questions to complete
-        if len(self.questions) > 0 and self.current_question < self.num_of_questions:
-            self.__load_question() 
-        
-        # all questions have been completed
-        else:
-            messagebox.showinfo("Done!", "You have completed all questions!")
-            self.__results_screen()
+        self.__load_question() # load next question to window
 
     # print message to terminal
     def __show_message(self) -> None:
@@ -302,32 +357,29 @@ class GUI:
         )
         label.pack(pady=20)
 
-        # score labels
-        correct_label = tk.Label(
-            result_wdw, 
-            text=f"{self.correct_count} / {self.num_of_questions} questions answered correctly!", 
+        # predicted label
+        predict_label = tk.Label(
+            result_wdw,
+            text=f"Cognitive Ability: {self.predicted_difficulty}",
             font=('Arial', BUTTON_FONT_SIZE)
         )
-        correct_label.pack(pady=10)
-        score_label = tk.Label(
-            result_wdw, 
-            text=f"Score: {self.score} / {self.possible_score}!", 
-            font=('Arial', BUTTON_FONT_SIZE)
-        )
-        score_label.pack(pady=10)
+        predict_label.pack(pady=10)
 
         # close window
         result_wdw.protocol("WM_DELETE_WINDOW", lambda: self.__on_closing(result_wdw))
         result_wdw.mainloop()
         
-    # exit GUI & close window
+    # exit GUI & close window with prompt
     def __on_closing(self, window) -> None:
+        logging.debug("User: " + self.username + " closed window.") # print debug
+
         if messagebox.askyesno(title="Quit", message="Do you really want to quit?"):
             try:
                 window.destroy()
             except Exception as e:
                 logging.warning(f"Error: {e}")
     
+    # exit GUI & close window without prompt
     def __close_without_prompt(self) -> None:
         try:
             self.root.destroy()
