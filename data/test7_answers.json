@@ -1,0 +1,74 @@
+[
+    {
+        "id": 6,
+        "selected_answer": "to do something early",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 17.190486907958984,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 1,
+        "selected_answer": "blue",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 2.1756889820098877,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 7,
+        "selected_answer": "unwilling",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 16.571789264678955,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 0,
+        "selected_answer": 2,
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 5.962593078613281,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 9,
+        "selected_answer": "they enjoy being alone",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 2.5975451469421387,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 3,
+        "selected_answer": "quack",
+        "result": 0,
+        "difficulty": 0,
+        "time_taken": 2.5037801265716553,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 4,
+        "selected_answer": "triangle",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 3.7812178134918213,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 8,
+        "selected_answer": "ignore it",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 2.5129051208496094,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 2,
+        "selected_answer": 3,
+        "result": 0,
+        "difficulty": 0,
+        "time_taken": 1.6676652431488037,
+        "predicted_difficulty": "low"
+    }
+]

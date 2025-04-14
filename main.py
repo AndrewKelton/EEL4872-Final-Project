@@ -9,11 +9,14 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
+from sklearn.model_selection import cross_val_score
 
-# import pandas as pd
 import numpy as np
 import json
 import sys
+
+FEATURES=['Weighted Correctness', 'Difficulty', 'Logged Time Taken']
+LINE="------------------------------------------------------------------------------------------------\n"
 
 # dummy training data, or control data
 dummy_X = [
@@ -85,7 +88,6 @@ def get_answers_to_X_y(folder_path: str = "data"):
                         result = compute_weighted_correct(int(answer['result']), float(answer['time_taken']))
                         difficulty = int(answer['difficulty'])
                         time_taken_logged = np.log(float(answer['time_taken']) + 1) # normalize time with log
-                        # predicted_difficulty = str(answer['predicted_difficulty'])
 
                         # assign label based on actual performance, not prediction
                         if result == gui.CORRECT and difficulty >= gui.MEDIUM:
@@ -106,54 +108,62 @@ def get_answers_to_X_y(folder_path: str = "data"):
 
     return X, y
 
+def grapher(model : DecisionTreeClassifier):
+    '''Graphs the importance of features in decision tree.'''
+    import matplotlib.pyplot as plt
+
+    importances = model.feature_importances_
+    indices=np.argsort(importances)[::-1]
+    plt.figure(figsize=(8, 5))
+    plt.title("Feature Importance in Cognitive Ability Decision Tree")
+    plt.bar(range(len(importances)), importances[indices], align="center")
+    plt.xticks(range(len(importances)), [FEATURES[i] for i in indices])
+    plt.xlabel("Features")
+    plt.ylabel("Importance")
+    plt.tight_layout()
+    plt.show()
+
+
 # main
 def main():
 
     # read questions from json file
-    low_questions, medium_questions, high_questions = get_questions("questions.json")
+    low_questions, medium_questions, high_questions = get_questions("input/questions.json")
 
-    X_train, y_train=[], []
-    if len(sys.argv) > 1:
-        print('reading file')
-        ''' If there is any command line input, read and prepare 
-            previous answers from previous tests in 'data/'. This 
-            will be our training data to train the Decision Tree.
-        '''
-        X_train, y_train = get_answers_to_X_y()
+    ''' Read and prepare previous answers from previous tests in 'data/'. 
+        This will be our training data to train the Decision Tree.
+    '''
+    X_train, y_train = get_answers_to_X_y()
 
     # normalize control data and extend training set
     dummy_X_logged = [[compute_weighted_correct(x[0], x[2]), x[1], np.log(x[2] + 1)] for x in dummy_X]
     X_train.extend(dummy_X_logged)
     y_train.extend(dummy_y)
     
-    model=DecisionTreeClassifier(class_weight="balanced")
+    model=DecisionTreeClassifier(class_weight="balanced") # initialize model
+
     # evaluate the model
     if len(X_train) >= 5:  # only evaluate if we have enough samples
         X_train_split, X_test, y_train_split, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
-        # model = DecisionTreeClassifier()
         model.fit(X_train_split, y_train_split)
         y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
+        scores = cross_val_score(model, X_train, y_train, cv=5)
 
         # save classification metrics
         with open("training_predictions.log", "w") as log:
-            log.write("\t\t\t\t\t\t--- Classification Report ---\n")
+            log.write(f"{LINE}Model Test Accuracy: {accuracy:.2f}\n{LINE}")
+            log.write(f"CV Accuracy Scores: {scores}\n")
+            log.write(f"Mean CV Accuracy: {scores.mean()}\n{LINE}")
+            log.write("\t\t\t\t\t   --- Classification Report ---\n")
             log.write(classification_report(y_test, y_pred))
 
-        print("--------------------------------")
-        print(f"   Model Test Accuracy: {accuracy:.2f}")
-        print("--------------------------------")
-
-    else:
-        print("-------------------------------------------------------------")
-        print("Not enough data to evaluate accuracy, training with full set.")
-        print("-------------------------------------------------------------")
-        # 
-        # # model = DecisionTreeClassifier()
-        # model.fit(X_train, y_train)
+    # use any command line input to view graph of feature importance
+    if len(sys.argv) > 1:
+        grapher(model)
+        return
     
-    # initialize and train the model
-    # model=DecisionTreeClassifier()
+    # refit the model with non split
     model.fit(X_train, y_train)
 
     # initialize GUI and start test

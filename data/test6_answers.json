@@ -1,0 +1,58 @@
+[
+    {
+        "id": 5,
+        "selected_answer": "to be of higher status",
+        "result": 0,
+        "difficulty": 1,
+        "time_taken": 8.33516526222229,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 3,
+        "selected_answer": "meow",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 10.239707946777344,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 4,
+        "selected_answer": "triangle",
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 4.972092151641846,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 7,
+        "selected_answer": "unwilling",
+        "result": 10,
+        "difficulty": 1,
+        "time_taken": 7.7986061573028564,
+        "predicted_difficulty": "medium"
+    },
+    {
+        "id": 1,
+        "selected_answer": "yellow",
+        "result": 0,
+        "difficulty": 0,
+        "time_taken": 5.997742176055908,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 0,
+        "selected_answer": 2,
+        "result": 10,
+        "difficulty": 0,
+        "time_taken": 23.131591796875,
+        "predicted_difficulty": "low"
+    },
+    {
+        "id": 2,
+        "selected_answer": 3,
+        "result": 0,
+        "difficulty": 0,
+        "time_taken": 2.7641239166259766,
+        "predicted_difficulty": "low"
+    }
+]
